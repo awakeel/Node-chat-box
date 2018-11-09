@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Page Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script src=" https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="jumbotron">
+            <h1 class="display-4">Send Message</h1>
+        </div>
+        <div>
+            <input class="form-control" placeholder="Name" id="name" />
+            <br>
+            <textarea class="form-control" placeholder="messsage" id="message"></textarea>
+            <br>
+            <button id="send" class="btn btn-success">Send</button>
+            <div id="messages"></div>
+        </div>
+    </div>
+</body>
+<script>
+    var io = io();
+    $(() => {
+
+        console.log('I am loaded');
+        $("#send").on('click', (ev) => {
+            var name = $("#name").val();
+            var message = $("#message").val();
+            postMessage({
+                name: name,
+                message: message
+            });
+        });
+        io.on('message', addMessage);
+
+        function getMessages() {
+            $.get("http://localhost:3000/messages", (data) => {
+                data.forEach(element => {
+                    addMessage(element);
+                });
+
+            });
+        }
+
+        function postMessage(message) {
+            $.post("http://localhost:3000/messages", message, (data) => {
+                console.log('Done');
+
+            });
+        }
+        var obj = {
+            name: "Abdul Wakeel",
+            message: "Hi, How high are you?"
+        }
+        addMessage(obj);
+        getMessages();
+
+        function addMessage(message) {
+            $("#messages").append("<p><h4> " + message.name + " </h4> <span> " + message.message + " </span></p>");
+        }
+    })
+</script>
+
+</html>
